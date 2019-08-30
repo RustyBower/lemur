@@ -522,6 +522,12 @@ def create_csr(**csr_config):
                     "Adding Critical Extension: {0} {1}".format(k, v)
                 )
                 if k == "sub_alt_names":
+                    # Raise an error if user requests too many SANs
+                    if current_app.config.get("LEMUR_MAX_SANS", False):
+                        if len(v["names"]) > current_app.config.get("LEMUR_MAX_SANS") + 1:  # Add 1 for our base domain
+                            current_app.logger.error("Too many SANS", exc_info=True)
+                            sentry.captureException()
+                            raise ValueError("Maximum number of SANs is {0}".format(current_app.config.get("LEMUR_MAX_SANS")))
                     if v["names"]:
                         builder = builder.add_extension(v["names"], critical=True)
                 else:
