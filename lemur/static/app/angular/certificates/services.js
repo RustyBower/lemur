@@ -182,7 +182,7 @@ angular.module('lemur')
       certificate.attachSubAltName();
       certificate.attachCustom();
       if (certificate.validityYears === '') { // if a user de-selects validity years we ignore it
-        delete certificate.validityYears;
+        certificate.validityYears = 2;
       }
       return CertificateApi.post(certificate);
     };
